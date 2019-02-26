@@ -1,0 +1,102 @@
+version: "2"
+
+x-logging:
+  &default-logging
+    driver: "json-file"
+    options:
+      max-size: "50m"
+      max-file: "10"
+
+services:
+  graylog-mongo:
+    image: "mongo:3.4.19"
+    logging: *default-logging
+    volumes:
+      - /data/mongo:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - graylog
+    restart: always
+
+  graylog-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.3
+    logging: *default-logging
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      - TZ=Asia/Bangkok
+      # Disable X-Pack security: https://www.elastic.co/guide/en/elasticsearch/reference/6.x/security-settings.html#general-security-settings
+      - xpack.security.enabled=false
+      - xpack.watcher.enabled=false
+      - xpack.monitoring.enabled=false
+      - xpack.security.audit.enabled=false
+      - xpack.ml.enabled=false
+      - xpack.graph.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx4g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 4G
+    volumes:
+      - /data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+      - "9350:9350"
+    networks:
+      - graylog
+    restart: always
+
+  graylog:
+    image: graylog/graylog:2.5
+    logging: *default-logging
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /data1/graylog/journal:/usr/share/graylog/data/journal
+      - /data1/graylog/config:/usr/share/graylog/data/config
+      - /data1/graylog/plugin/graylog-plugin-slack-3.1.0.jar:/usr/share/graylog/plugin/graylog-plugin-slack-3.1.0.jar
+      - /data1/graylog/plugin/graylog-plugin-beats-2.5.1.jar:/usr/share/graylog/plugin/graylog-plugin-beats-2.5.1.jar
+    environment:
+      GRAYLOG_PASSWORD_SECRET: replacethiswithyourownsecret
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      GRAYLOG_WEB_ENDPOINT_URI: http://youripaddress:9000/api
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+      GRAYLOG_TRANSPORT_EMAIL_ENABLED: "true"
+      GRAYLOG_TRANSPORT_EMAIL_HOSTNAME: smtp.yourdomain.com
+      GRAYLOG_TRANSPORT_EMAIL_PORT: 25
+      GRAYLOG_TRANSPORT_EMAIL_USE_AUTH: "false"
+      GRAYLOG_TRANSPORT_EMAIL_USE_TLS: "false"
+      GRAYLOG_TRANSPORT_EMAIL_USE_SSL: "false"
+
+    links:
+      - graylog-mongo:mongo
+      - graylog-elasticsearch:elasticsearch
+    ports:
+      - "9000:9000"
+      - "12201:12201"
+      - "1514:1514/udp"
+      - "2000-2005:2000-2005/udp"
+      - "3000-3005:3000-3005/udp"
+      - "4000-4005:4000-4005/udp" 
+      - "5000-5005:5000-5005/udp"
+      - "5000-5005:5000-5005/tcp"
+      - "2514:2514/udp"
+      - "514:514"
+    extra_hosts:
+      - "yourldaphost:192.168.xxx.xxx"
+      - "smtp.yourdomain.com:192.168.xxx.xxx"
+    networks:
+      - graylog
+    restart: always
+
+networks:
+  graylog:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.10.0/24
