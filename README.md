@@ -33,8 +33,8 @@ Latest stable version of Graylog is *2.5.1* this Version is available with the t
 - chown 1000:1000 -R /data/elasticsearch
 
 ### Start up
-- pull graylog from this reppository
-- copy plugin from plugin folder to /data/graylog/plugin
+- pull graylog from this repository
+- copy plugin to plugin folder /data/graylog/plugin
 - docker-compose up -d
 
 ### Access to mongo shell
