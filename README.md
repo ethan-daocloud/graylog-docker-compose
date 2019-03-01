@@ -13,6 +13,7 @@ Latest stable version of Graylog is *2.5.1* this Version is available with the t
 
 ### Elasticsearch
 - /data/elasticsearch
+
 `Folder permission should be uid:1000 / gid:1000`
 
 ## Installation
