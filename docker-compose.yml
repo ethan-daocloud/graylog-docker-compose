@@ -56,10 +56,10 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - /data1/graylog/journal:/usr/share/graylog/data/journal
-      - /data1/graylog/config:/usr/share/graylog/data/config
-      - /data1/graylog/plugin/graylog-plugin-slack-3.1.0.jar:/usr/share/graylog/plugin/graylog-plugin-slack-3.1.0.jar
-      - /data1/graylog/plugin/graylog-plugin-beats-2.5.1.jar:/usr/share/graylog/plugin/graylog-plugin-beats-2.5.1.jar
+      - /data/graylog/journal:/usr/share/graylog/data/journal
+      - /data/graylog/config:/usr/share/graylog/data/config
+      - /data/graylog/plugin/graylog-plugin-slack-3.1.0.jar:/usr/share/graylog/plugin/graylog-plugin-slack-3.1.0.jar
+      - /data/graylog/plugin/graylog-plugin-beats-2.5.1.jar:/usr/share/graylog/plugin/graylog-plugin-beats-2.5.1.jar
     environment:
       GRAYLOG_PASSWORD_SECRET: replacethiswithyourownsecret
       GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
